@@ -1,0 +1,18 @@
+{
+  "name": "com.leondrace.projectinitializer",
+  "displayName": "Project Initializer",
+  "description": "Custom Editor Window to quickly generate folders, batch import local and git url packages.",
+  "version": "0.0.1",
+  "keywords": [
+    "extension",
+    "attribute",
+    "inspector",
+    "editor"
+  ],
+  "category": "editor extensions",
+  "dependencies": {},
+  "author": {
+    "name": "Leon Drace",
+    "url": "https://github.com/LeonDrace"
+  }
+}
