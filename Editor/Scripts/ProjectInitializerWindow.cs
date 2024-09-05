@@ -18,7 +18,7 @@ namespace LeonDrace.ProjectInitializer
 		#region Window Drawing
 
 		private Vector2 m_scrollPos;
-		private string m_FolderCreationTitle = "Create Folder Structure";
+		private string m_FolderCreationTitle = "Folder Structure";
 
 		private void OnGUI()
 		{
@@ -29,9 +29,12 @@ namespace LeonDrace.ProjectInitializer
 
 		private void DrawFolderSetup()
 		{
-			EditorGUILayout.LabelField(m_FolderCreationTitle, EditorStyles.boldLabel);
+			GUILayout.BeginVertical(m_FolderCreationTitle, "window");
 
 			CreateFolderStructure();
+
+			GUILayout.EndVertical();
+			GUILayout.FlexibleSpace();
 		}
 
 		private void CreateFolderStructure()
