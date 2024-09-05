@@ -2,7 +2,7 @@
   "name": "com.leondrace.projectinitializer",
   "displayName": "Project Initializer",
   "description": "Custom Editor Window to quickly generate folders, batch import local and git url packages.",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "keywords": [
     "extension",
     "attribute",

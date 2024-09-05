@@ -17,12 +17,20 @@ namespace LeonDrace.ProjectInitializer
 
 		#region Window Drawing
 
-		private Vector2 m_scrollPos;
+		private Vector2 m_ScrollPos;
 		private string m_FolderCreationTitle = "Folder Structure";
+		private ProjectInitializerData m_Data;
+		private SerializedObject m_DataSerializedObject;
+
+		private void OnEnable()
+		{
+			m_Data = Resources.Load<ProjectInitializerData>(ProjectInitializerData.AssetName);
+			m_DataSerializedObject = new SerializedObject(m_Data);
+		}
 
 		private void OnGUI()
 		{
-			m_scrollPos = EditorGUILayout.BeginScrollView(m_scrollPos);
+			m_ScrollPos = EditorGUILayout.BeginScrollView(m_ScrollPos);
 			DrawFolderSetup();
 			EditorGUILayout.EndScrollView();
 		}
@@ -31,10 +39,30 @@ namespace LeonDrace.ProjectInitializer
 		{
 			GUILayout.BeginVertical(m_FolderCreationTitle, "window");
 
+			ShowFolderStructureConfig();
 			CreateFolderStructure();
 
 			GUILayout.EndVertical();
 			GUILayout.FlexibleSpace();
+		}
+
+		private void ShowFolderStructureConfig()
+		{
+			EditorGUI.BeginChangeCheck();
+
+			SerializedProperty iterator = m_DataSerializedObject.GetIterator();
+			iterator.NextVisible(true);
+			do
+			{
+				if (iterator.name == "m_FirstField") break;
+				EditorGUILayout.PropertyField(iterator);
+
+			} while (iterator.NextVisible(false));
+
+			if (EditorGUI.EndChangeCheck())
+			{
+				m_DataSerializedObject.ApplyModifiedProperties();
+			}
 		}
 
 		private void CreateFolderStructure()
