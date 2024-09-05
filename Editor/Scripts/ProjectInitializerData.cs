@@ -7,6 +7,14 @@ namespace LeonDrace.ProjectInitializer
 	{
 		public static readonly string AssetName = "Project Initializer Data";
 
+		[SerializeField, HideInInspector]
+		private bool m_Show = false;
+		public bool Show
+		{
+			get => m_Show;
+			set => m_Show = value;
+		}
+
 		[SerializeField]
 		private FolderStructure m_FolderStructure;
 		public FolderStructure GetFolderStructure => m_FolderStructure;
