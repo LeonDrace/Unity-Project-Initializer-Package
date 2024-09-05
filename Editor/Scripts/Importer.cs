@@ -11,7 +11,7 @@ namespace LeonDrace.ProjectInitializer
 	{
 		public static void CreateFolderStructure()
 		{
-			var data = LoadAssetAtPath<ProjectInitializerData>("Project Initializer Data");
+			var data = Resources.Load<ProjectInitializerData>("Project Initializer Data");
 
 			if (data == null)
 			{
