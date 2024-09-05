@@ -12,27 +12,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c48cf6ed654d85848968195682dbaef5, type: 3}
   m_Name: Project Initializer Data
   m_EditorClassIdentifier: 
-  m_folderStructure:
-    m_rootFolder: Core
-    m_createdFolders:
-    - Animation
+  m_Show: 0
+  m_FolderStructure:
+    m_RootFolder: Core
+    m_CreatedFolders:
+    - Animations
+    - 2D
     - 2D/Sprites
-    - 2D/Prefabs
     - 2D/Materials
+    - 2D/Prefabs
+    - 3D
     - 3D/Models
-    - 3D/Prefabs
     - 3D/Textures
     - 3D/Materials
+    - 3D/Prefabs
+    - Scripts
     - Scripts/Tests
     - Scripts/Tests/Editor
     - Scripts/Tests/Runtime
-    - Prefabs
     - Settings
-    m_movedFiles:
-    - m_currentPath: Assets/Settings
-      m_targetPath: Assets/$root/Settings
-    - m_currentPath: Assets/InputSystem_Actions.inputactions
-      m_targetPath: Assets/$root/Settings/InputSystem_Actions.inputactions
-    m_deletedFolders:
+    m_MovedFiles:
+    - m_CurrentPath: Assets/Settings
+      m_TargetPath: Assets/$root/Settings
+    - m_CurrentPath: Assets/InputSystem_Actions.inputactions
+      m_TargetPath: Assets/$root/Settings/InputSystem_Actions.inputactions
+    m_DeletedFolders:
     - Scenes
     - TutorialInfo
