@@ -23,7 +23,7 @@ namespace LeonDrace.ProjectInitializer
 			Refresh();
 			var currentPaths = data.GetFolderStructure.MovedFiles.Select(x => x.CurrentPath).ToArray();
 			var targetPaths = data.GetFolderStructure.MovedFiles.Select(x => x.TargetPath).ToArray();
-			Folders.MoveAssets(currentPaths, targetPaths);
+			Folders.MoveAssets(data.GetFolderStructure.RootFolder, currentPaths, targetPaths);
 			Refresh();
 			Folders.DeleteFolders(data.GetFolderStructure.DeletedFolders);
 			Refresh();
@@ -60,20 +60,21 @@ namespace LeonDrace.ProjectInitializer
 				}
 			}
 
-			public static void MoveAssets(string[] currentPath, string[] targetPath)
+			public static void MoveAssets(string rootName, string[] currentPath, string[] targetPath)
 			{
 				int count = currentPath.Length;
 				for (int i = 0; i < count; i++)
 				{
-					Move(currentPath[i], targetPath[i]);
+					Move(rootName, currentPath[i], targetPath[i]);
 				}
 			}
 
-			public static void Move(string currentPath, string targetPath)
+			public static void Move(string rootName, string currentPath, string targetPath)
 			{
 				if (IsValidFolder(currentPath) || File.Exists(currentPath))
 				{
 					var destinationPath = $"{targetPath}";
+					destinationPath = destinationPath.Replace("$root", rootName);
 					var error = MoveAsset(currentPath, destinationPath);
 
 					if (!string.IsNullOrEmpty(error))

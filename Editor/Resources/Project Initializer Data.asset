@@ -19,6 +19,7 @@ MonoBehaviour:
     - 2D/Sprites
     - 2D/Prefabs
     - 2D/Materials
+    - 3D/Models
     - 3D/Prefabs
     - 3D/Textures
     - 3D/Materials
@@ -28,12 +29,10 @@ MonoBehaviour:
     - Prefabs
     - Settings
     m_movedFiles:
-    - m_isAsset: 0
-      m_currentPath: Assets/Settings
-      m_targetPath: Assets/Core/Settings
-    - m_isAsset: 1
-      m_currentPath: Assets/InputSystem_Actions.inputactions
-      m_targetPath: Assets/Core/Settings/InputSystem_Actions.inputactions
+    - m_currentPath: Assets/Settings
+      m_targetPath: Assets/$root/Settings
+    - m_currentPath: Assets/InputSystem_Actions.inputactions
+      m_targetPath: Assets/$root/Settings/InputSystem_Actions.inputactions
     m_deletedFolders:
     - Scenes
     - TutorialInfo
