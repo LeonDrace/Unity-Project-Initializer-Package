@@ -9,7 +9,7 @@ namespace LeonDrace.ProjectInitializer
 {
 	public class Importer
 	{
-		public static void CreateFolderStructure()
+		public static void CreateFolderStructure(FolderStructure folderStructure)
 		{
 			var data = Resources.Load<ProjectInitializerData>(ProjectInitializerData.AssetName);
 
@@ -19,13 +19,13 @@ namespace LeonDrace.ProjectInitializer
 				return;
 			}
 
-			Folders.CreateFolders(data.GetFolderStructure.RootFolder, data.GetFolderStructure.CreatedFolders);
+			Folders.CreateFolders(folderStructure.RootFolder, folderStructure.CreatedFolders);
 			Refresh();
-			var currentPaths = data.GetFolderStructure.MovedFiles.Select(x => x.CurrentPath).ToArray();
-			var targetPaths = data.GetFolderStructure.MovedFiles.Select(x => x.TargetPath).ToArray();
-			Folders.MoveAssets(data.GetFolderStructure.RootFolder, currentPaths, targetPaths);
+			var currentPaths = folderStructure.MovedFiles.Select(x => x.CurrentPath).ToArray();
+			var targetPaths = folderStructure.MovedFiles.Select(x => x.TargetPath).ToArray();
+			Folders.MoveAssets(folderStructure.RootFolder, currentPaths, targetPaths);
 			Refresh();
-			Folders.DeleteFolders(data.GetFolderStructure.DeletedFolders);
+			Folders.DeleteFolders(folderStructure.DeletedFolders);
 			Refresh();
 		}
 
