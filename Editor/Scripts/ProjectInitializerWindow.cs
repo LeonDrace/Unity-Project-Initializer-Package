@@ -22,10 +22,12 @@ namespace LeonDrace.ProjectInitializer
 		private string m_DebugTitle = "Debug";
 		private ProjectInitializerData m_Data;
 		private SerializedObject m_DataSerializedObject;
+		private string m_SearchFilter = "l:architecture";
 
 		private void OnEnable()
 		{
-			m_Data = Resources.Load<ProjectInitializerData>(ProjectInitializerData.AssetName);
+			//m_Data = Resources.Load<ProjectInitializerData>(ProjectInitializerData.AssetName);
+			m_Data = SearchForConfig<ProjectInitializerData>(m_SearchFilter);
 		}
 
 		private void OnGUI()
@@ -117,6 +119,21 @@ namespace LeonDrace.ProjectInitializer
 			GUILayout.EndVertical();
 
 			if (addFlexibleSpace) GUILayout.FlexibleSpace();
+		}
+
+		private static T SearchForConfig<T>(string filter) where T : ScriptableObject
+		{
+			string[] guids = AssetDatabase.FindAssets(filter);
+			foreach (string guid in guids)
+			{
+				T config = AssetDatabase.LoadAssetAtPath<T>(AssetDatabase.GUIDToAssetPath(guid));
+				if (config != null)
+				{
+					return (T)config;
+				}
+			}
+			Debug.LogError($"The requested config was not found: {typeof(T)} it might be missing the config asset label.");
+			return null;
 		}
 
 		#endregion

@@ -39,3 +39,31 @@ MonoBehaviour:
     m_DeletedFolders:
     - Scenes
     - TutorialInfo
+  m_Presets:
+  - m_Name: Small Project
+    m_FolderStructure:
+      m_RootFolder: Core
+      m_CreatedFolders:
+      - Animations
+      - 2D
+      - 2D/Sprites
+      - 2D/Materials
+      - 2D/Prefabs
+      - 3D
+      - 3D/Models
+      - 3D/Textures
+      - 3D/Materials
+      - 3D/Prefabs
+      - Scripts
+      - Scripts/Tests
+      - Scripts/Tests/Editor
+      - Scripts/Tests/Runtime
+      - Settings
+      m_MovedFiles:
+      - m_CurrentPath: Assets/Settings
+        m_TargetPath: Assets/$root/Settings
+      - m_CurrentPath: Assets/InputSystem_Actions.inputactions
+        m_TargetPath: Assets/$root/Settings/InputSystem_Actions.inputactions
+      m_DeletedFolders:
+      - Scenes
+      - TutorialInfo
