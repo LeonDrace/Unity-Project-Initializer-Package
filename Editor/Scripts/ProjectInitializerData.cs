@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace LeonDrace.ProjectInitializer
@@ -18,7 +19,46 @@ namespace LeonDrace.ProjectInitializer
 		[SerializeField]
 		private FolderStructure m_FolderStructure;
 		public FolderStructure GetFolderStructure => m_FolderStructure;
+		[SerializeField]
+		private Preset[] m_Presets;
+		[SerializeField]
+		public Preset[] Presets
+		{
+			get => m_Presets;
+			set => m_Presets = value;
+		}
 
+		public void AddNewPreset()
+		{
+			var tempList = new List<Preset>(m_Presets)
+			{
+				new Preset() { Name = "New Preset" }
+			};
+			m_Presets = tempList.ToArray();
+		}
+
+		public void RemovePresetAt(int index)
+		{
+			var tempList = new List<Preset>(m_Presets);
+			tempList.RemoveAt(index);
+			m_Presets = tempList.ToArray();
+		}
+
+
+		[System.Serializable]
+		public sealed class Preset
+		{
+			[SerializeField]
+			private string m_Name;
+			public string Name
+			{
+				get => m_Name;
+				set => m_Name = value;
+			}
+			[SerializeField]
+			private FolderStructure m_FolderStructure;
+			public FolderStructure FolderStructure => m_FolderStructure;
+		}
 
 		[System.Serializable]
 		public sealed class FolderStructure
