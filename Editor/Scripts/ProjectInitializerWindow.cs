@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -25,6 +25,7 @@ namespace LeonDrace.ProjectInitializer
 		private string m_PresetsTitle = "Presets";
 		private string m_NoPresets = "Create a Preset!";
 		private string m_DebugTitle = "Debug";
+		private string m_ImportExportTitle = "Import/Export";
 
 		//Data
 		private ProjectInitializerData m_Data;
@@ -40,9 +41,13 @@ namespace LeonDrace.ProjectInitializer
 		private string m_DeletePresetButton = "Delete Preset";
 		private string m_DeleteMessage = "Are You Sure You Want To Delete The Entire Preset?";
 
+		//Import Export
+		private string m_ExportName = "New Preset";
+		private string m_ExportMessage = string.Empty;
+		private string m_ImportMessage = string.Empty;
+
 		private void OnEnable()
 		{
-			//m_Data = Resources.Load<ProjectInitializerData>(ProjectInitializerData.AssetName);
 			m_Data = SearchForConfig<ProjectInitializerData>(m_SearchFilter);
 			m_DefaultGuiBackgroundColor = GUI.backgroundColor;
 		}
@@ -56,6 +61,8 @@ namespace LeonDrace.ProjectInitializer
 			DrawPresets();
 			GUILayout.Space(5);
 			DrawFolderSetup();
+			GUILayout.Space(5);
+			DrawImporterExporter();
 			GUILayout.Space(5);
 			DrawDebugOptions();
 
@@ -149,7 +156,7 @@ namespace LeonDrace.ProjectInitializer
 		{
 			if (GUILayout.Button(m_CreateFolderButton))
 			{
-				Importer.CreateFolderStructure();
+				Importer.CreateFolderStructure(m_Data.Presets[m_SelectedPresetIndex].FolderStructure);
 			}
 		}
 
@@ -163,6 +170,64 @@ namespace LeonDrace.ProjectInitializer
 					m_SelectedPresetIndex = m_SelectedPresetIndex-- < 0 ? 0 : m_SelectedPresetIndex--;
 				}
 			}
+		}
+
+		#endregion
+
+		#region Importer/Exporter
+
+		private void DrawImporterExporter()
+		{
+			CreateContainer(m_ImportExportTitle, () =>
+			{
+				ImportJson();
+				ExportJson();
+
+				if (!string.IsNullOrEmpty(m_ImportMessage))
+				{
+					CreateMessage(m_ImportMessage);
+				}
+
+				if (!string.IsNullOrEmpty(m_ExportMessage))
+				{
+					CreateMessage(m_ExportMessage);
+				}
+			});
+		}
+
+		private void ImportJson()
+		{
+			if (GUILayout.Button("Import Presets As .json"))
+			{
+				var path = EditorUtility.OpenFilePanel("Importer", "", "json");
+				if (path != null && path.Length != 0 && path.Contains(".json"))
+				{
+					JsonDeserialiserOverwrite(path, m_Data);
+					m_ImportMessage = string.Empty;
+				}
+				else
+				{
+					m_ImportMessage = "Nothing Selected Or Wrong File Format!";
+				}
+			}
+		}
+
+		private void ExportJson()
+		{
+			EditorGUILayout.BeginHorizontal();
+			m_ExportName = EditorGUILayout.TextField(m_ExportName);
+			if (GUILayout.Button("Export Presets As .json"))
+			{
+				var path = EditorUtility.OpenFolderPanel("Exporter", "", "json");
+				if (path != null && path.Length != 0)
+				{
+					path = $"{path}/{m_ExportName}.json";
+					JsonSerialiser<ProjectInitializerData>(m_Data, path);
+
+					m_ExportMessage = $"Presets Have Been Exported To {path}";
+				}
+			}
+			EditorGUILayout.EndHorizontal();
 		}
 
 		#endregion
@@ -221,6 +286,39 @@ namespace LeonDrace.ProjectInitializer
 			}
 			Debug.LogError($"The requested config was not found: {typeof(T)} it might be missing the config asset label.");
 			return null;
+		}
+
+		/// <summary>
+		/// Create a json file at the given path.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="obj"></param>
+		/// <param name="path"></param>
+		private static void JsonSerialiser<T>(object obj, string path)
+		{
+			string json = JsonUtility.ToJson((T)obj, true);
+			StreamWriter writer = new StreamWriter(path, false);
+			writer.Write(json);
+			writer.Close();
+		}
+
+		/// <summary>
+		/// Will overwrite the data on an object.
+		/// Useful for <see cref="ScriptableObject"/> which are instanced differently from normal objects.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <param name="overwrittenObject"></param>
+		private static void JsonDeserialiserOverwrite(string path, object overwrittenObject)
+		{
+			StreamReader reader = new StreamReader(path);
+			string json = reader.ReadToEnd();
+			reader.Close();
+			JsonUtility.FromJsonOverwrite(json, overwrittenObject);
+		}
+
+		private void CreateMessage(string message, MessageType messageType = MessageType.Info)
+		{
+			EditorGUILayout.HelpBox(message, messageType);
 		}
 
 		#endregion
