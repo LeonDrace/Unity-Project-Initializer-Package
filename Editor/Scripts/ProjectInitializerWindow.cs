@@ -30,7 +30,6 @@ namespace LeonDrace.ProjectInitializer
 		//Data
 		private ProjectInitializerData m_Data;
 		private SerializedObject m_DataSerializedObject;
-		private string m_SearchFilter = "l:architecture";
 
 		//Index
 		private int m_SelectedPresetIndex = 0;
@@ -48,7 +47,7 @@ namespace LeonDrace.ProjectInitializer
 
 		private void OnEnable()
 		{
-			m_Data = SearchForConfig<ProjectInitializerData>(m_SearchFilter);
+			m_Data = AssetInitializer.SearchForConfig<ProjectInitializerData>(AssetInitializer.ArchitectureFilter);
 			m_DefaultGuiBackgroundColor = GUI.backgroundColor;
 		}
 
@@ -156,7 +155,7 @@ namespace LeonDrace.ProjectInitializer
 		{
 			if (GUILayout.Button(m_CreateFolderButton))
 			{
-				Importer.CreateFolderStructure(m_Data.Presets[m_SelectedPresetIndex].FolderStructure);
+				AssetInitializer.CreateFolderStructure(m_Data.Presets[m_SelectedPresetIndex].FolderStructure);
 			}
 		}
 
@@ -200,15 +199,7 @@ namespace LeonDrace.ProjectInitializer
 			if (GUILayout.Button("Import Presets As .json"))
 			{
 				var path = EditorUtility.OpenFilePanel("Importer", "", "json");
-				if (path != null && path.Length != 0 && path.Contains(".json"))
-				{
-					JsonDeserialiserOverwrite(path, m_Data);
-					m_ImportMessage = string.Empty;
-				}
-				else
-				{
-					m_ImportMessage = "Nothing Selected Or Wrong File Format!";
-				}
+				m_ImportMessage = AssetInitializer.ImportJson(path, m_Data);
 			}
 		}
 
@@ -219,13 +210,7 @@ namespace LeonDrace.ProjectInitializer
 			if (GUILayout.Button("Export Presets As .json"))
 			{
 				var path = EditorUtility.OpenFolderPanel("Exporter", "", "json");
-				if (path != null && path.Length != 0)
-				{
-					path = $"{path}/{m_ExportName}.json";
-					JsonSerialiser<ProjectInitializerData>(m_Data, path);
-
-					m_ExportMessage = $"Presets Have Been Exported To {path}";
-				}
+				m_ExportMessage = AssetInitializer.ExportJson($"{path}/{m_ExportName}.json", m_Data);
 			}
 			EditorGUILayout.EndHorizontal();
 		}
@@ -271,49 +256,6 @@ namespace LeonDrace.ProjectInitializer
 			GUILayout.EndVertical();
 
 			if (addFlexibleSpace) GUILayout.FlexibleSpace();
-		}
-
-		private static T SearchForConfig<T>(string filter) where T : ScriptableObject
-		{
-			string[] guids = AssetDatabase.FindAssets(filter);
-			foreach (string guid in guids)
-			{
-				T config = AssetDatabase.LoadAssetAtPath<T>(AssetDatabase.GUIDToAssetPath(guid));
-				if (config != null)
-				{
-					return config;
-				}
-			}
-			Debug.LogError($"The requested config was not found: {typeof(T)} it might be missing the config asset label.");
-			return null;
-		}
-
-		/// <summary>
-		/// Create a json file at the given path.
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="obj"></param>
-		/// <param name="path"></param>
-		private static void JsonSerialiser<T>(object obj, string path)
-		{
-			string json = JsonUtility.ToJson((T)obj, true);
-			StreamWriter writer = new StreamWriter(path, false);
-			writer.Write(json);
-			writer.Close();
-		}
-
-		/// <summary>
-		/// Will overwrite the data on an object.
-		/// Useful for <see cref="ScriptableObject"/> which are instanced differently from normal objects.
-		/// </summary>
-		/// <param name="path"></param>
-		/// <param name="overwrittenObject"></param>
-		private static void JsonDeserialiserOverwrite(string path, object overwrittenObject)
-		{
-			StreamReader reader = new StreamReader(path);
-			string json = reader.ReadToEnd();
-			reader.Close();
-			JsonUtility.FromJsonOverwrite(json, overwrittenObject);
 		}
 
 		private void CreateMessage(string message, MessageType messageType = MessageType.Info)
