@@ -193,9 +193,24 @@ namespace LeonDrace.ProjectInitializer
 				{
 					m_DataSerializedObject.ApplyModifiedProperties();
 				}
+
+				ImportLocalPackages();
 			});
+		}
 
-
+		private void ImportLocalPackages()
+		{
+			if (GUILayout.Button("Import"))
+			{
+				var localPackages = m_Data.Presets[m_SelectedPresetIndex].LocalPackages;
+				foreach (var package in localPackages)
+				{
+					if (package.Active)
+					{
+						PackageImporter.ImportLocalPackage(package.Path);
+					}
+				}
+			}
 		}
 
 		#endregion
