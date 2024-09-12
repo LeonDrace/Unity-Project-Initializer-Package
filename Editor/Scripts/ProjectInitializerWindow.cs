@@ -24,6 +24,7 @@ namespace LeonDrace.ProjectInitializer
 		private string m_FolderCreationTitle = "Folder Structure";
 		private string m_PresetsTitle = "Presets";
 		private string m_NoPresets = "Create a Preset!";
+		private string m_LocalPackagesTitle = "Local Packages";
 		private string m_DebugTitle = "Debug";
 		private string m_ImportExportTitle = "Import/Export";
 
@@ -60,6 +61,8 @@ namespace LeonDrace.ProjectInitializer
 			DrawPresets();
 			GUILayout.Space(5);
 			DrawFolderSetup();
+			GUILayout.Space(5);
+			DrawLocalPackages();
 			GUILayout.Space(5);
 			DrawImporterExporter();
 			GUILayout.Space(5);
@@ -173,6 +176,30 @@ namespace LeonDrace.ProjectInitializer
 
 		#endregion
 
+		#region Packages
+
+		private void DrawLocalPackages()
+		{
+			CreateContainer(m_LocalPackagesTitle, () =>
+			{
+				EditorGUI.BeginChangeCheck();
+
+				SerializedProperty localPackagesProperty = m_DataSerializedObject.FindProperty("m_Presets").
+				GetArrayElementAtIndex(m_SelectedPresetIndex).FindPropertyRelative("m_LocalPackages");
+
+				EditorGUILayout.PropertyField(localPackagesProperty);
+
+				if (EditorGUI.EndChangeCheck())
+				{
+					m_DataSerializedObject.ApplyModifiedProperties();
+				}
+			});
+
+
+		}
+
+		#endregion
+
 		#region Importer/Exporter
 
 		private void DrawImporterExporter()
@@ -200,6 +227,9 @@ namespace LeonDrace.ProjectInitializer
 			{
 				var path = EditorUtility.OpenFilePanel("Importer", "", "json");
 				m_ImportMessage = AssetInitializer.ImportJson(path, m_Data);
+				EditorUtility.SetDirty(m_Data);
+				m_DataSerializedObject = new SerializedObject(m_Data);
+				m_DataSerializedObject.ApplyModifiedProperties();
 			}
 		}
 

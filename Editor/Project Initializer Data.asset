@@ -41,7 +41,10 @@ MonoBehaviour:
       m_DeletedFolders:
       - Scenes
       - TutorialInfo
-    m_LocalPackages: []
+    m_LocalPackages:
+    - m_Active: 1
+      m_Path: Muka Schultze\Editor ExtensionsUtilities\Fullscreen Editor.unitypackage
+      m_Tag: Editor
   - m_Name: Package
     m_FolderStructure:
       m_RootFolder: Assets
