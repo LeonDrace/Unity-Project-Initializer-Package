@@ -13,32 +13,6 @@ MonoBehaviour:
   m_Name: Project Initializer Data
   m_EditorClassIdentifier: 
   m_Show: 0
-  m_FolderStructure:
-    m_RootFolder: Core
-    m_CreatedFolders:
-    - Animations
-    - 2D
-    - 2D/Sprites
-    - 2D/Materials
-    - 2D/Prefabs
-    - 3D
-    - 3D/Models
-    - 3D/Textures
-    - 3D/Materials
-    - 3D/Prefabs
-    - Scripts
-    - Scripts/Tests
-    - Scripts/Tests/Editor
-    - Scripts/Tests/Runtime
-    - Settings
-    m_MovedFiles:
-    - m_CurrentPath: Assets/Settings
-      m_TargetPath: Assets/$root/Settings
-    - m_CurrentPath: Assets/InputSystem_Actions.inputactions
-      m_TargetPath: Assets/$root/Settings/InputSystem_Actions.inputactions
-    m_DeletedFolders:
-    - Scenes
-    - TutorialInfo
   m_Presets:
   - m_Name: Small Project
     m_FolderStructure:
@@ -67,3 +41,17 @@ MonoBehaviour:
       m_DeletedFolders:
       - Scenes
       - TutorialInfo
+    m_LocalPackages: []
+  - m_Name: Package
+    m_FolderStructure:
+      m_RootFolder: Assets
+      m_CreatedFolders:
+      - Editor
+      - Runtime
+      - Tests
+      - Tests/Editor
+      - Tests/Runtime
+      m_MovedFiles: []
+      m_DeletedFolders:
+      - Scenes
+    m_LocalPackages: []
