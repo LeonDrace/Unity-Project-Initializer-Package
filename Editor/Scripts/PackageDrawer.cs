@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,29 +6,58 @@ namespace LeonDrace.ProjectInitializer
 	[CustomPropertyDrawer(typeof(ProjectInitializerData.Package))]
 	public class PackageDrawer : PropertyDrawer
 	{
+		private string[] m_DisplayOptions = new string[2] { "Unity Path", "Custom Path" };
+		private int m_ActiveToggleWidth = 20;
+		private int m_PathDropdownWidth = 100;
+		private float m_PathPercentage = 0.85f;
+
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			SerializedProperty activeProperty = property.FindPropertyRelative("m_Active");
 			SerializedProperty pathProperty = property.FindPropertyRelative("m_Path");
 			SerializedProperty tagProperty = property.FindPropertyRelative("m_Tag");
+			SerializedProperty customPathProperty = property.FindPropertyRelative("m_HasCustomPath");
+
+			int selection = customPathProperty.boolValue ? 1 : 0;
 
 			EditorGUI.BeginChangeCheck();
 
 			Rect rect = GetFullRect(position);
 			float fullWidth = rect.width;
+			float availableWidth = fullWidth;
+			float x_Pos = rect.position.x;
+
 			//Active
-			rect.width = 20;
+			rect.width = m_ActiveToggleWidth;
+			availableWidth -= rect.width;
 			EditorGUI.PropertyField(rect, activeProperty, new GUIContent());
+			rect.position = new Vector2(rect.position.x, rect.position.y);
+			x_Pos += rect.width;
+
+			//Custom Path
+			rect.position = new Vector2(x_Pos, rect.position.y);
+			rect.width = m_PathDropdownWidth;
+			availableWidth -= rect.width;
+			selection = EditorGUI.Popup(rect, selection, m_DisplayOptions);
+			customPathProperty.boolValue = selection == 1 ? true : false;
+			x_Pos += rect.width;
+
 			//Path
-			rect.position = new Vector2(rect.position.x + rect.width, rect.position.y);
-			rect.width = fullWidth / 4 - 20;
-			EditorGUI.LabelField(rect, new GUIContent() { text = "Path" });
-			rect.position = new Vector2(rect.position.x + rect.width, rect.position.y);
+			float tagLabelWidth = EditorStyles.label.CalcSize(new GUIContent("Tag")).x;
+			rect.width = availableWidth * m_PathPercentage - tagLabelWidth;
+			availableWidth -= rect.width;
+			rect.position = new Vector2(x_Pos, rect.position.y);
 			EditorGUI.PropertyField(rect, pathProperty, new GUIContent());
+			x_Pos += rect.width;
+
 			//Tag
-			rect.position = new Vector2(rect.position.x + rect.width, rect.position.y);
+			rect.position = new Vector2(x_Pos, rect.position.y);
+			rect.width = tagLabelWidth;
+			availableWidth -= rect.width;
 			EditorGUI.LabelField(rect, new GUIContent() { text = "Tag" });
-			rect.position = new Vector2(rect.position.x + rect.width, rect.position.y);
+			x_Pos += tagLabelWidth;
+			rect.width = availableWidth;
+			rect.position = new Vector2(x_Pos, rect.position.y);
 			EditorGUI.PropertyField(rect, tagProperty, new GUIContent());
 
 			if (EditorGUI.EndChangeCheck())
