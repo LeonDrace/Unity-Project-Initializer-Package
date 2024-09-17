@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -46,6 +49,11 @@ namespace LeonDrace.ProjectInitializer
 		private string m_ExportMessage = string.Empty;
 		private string m_ImportMessage = string.Empty;
 
+		//Packages
+		private string m_defaultLocalPackageModeTitle = "Default";
+		private string m_filteredLocalPackageModeTitle = "Filtered";
+		private bool m_defaultLocalPackages = false;
+
 		private void OnEnable()
 		{
 			m_Data = AssetInitializer.SearchForConfig<ProjectInitializerData>(AssetInitializer.ArchitectureFilter);
@@ -58,13 +66,13 @@ namespace LeonDrace.ProjectInitializer
 			m_DataSerializedObject = new SerializedObject(m_Data);
 			m_ScrollPos = EditorGUILayout.BeginScrollView(m_ScrollPos);
 
+			DrawImporterExporter();
+			GUILayout.Space(5);
 			DrawPresets();
 			GUILayout.Space(5);
 			DrawFolderSetup();
 			GUILayout.Space(5);
 			DrawLocalPackages();
-			GUILayout.Space(5);
-			DrawImporterExporter();
 			GUILayout.Space(5);
 			DrawDebugOptions();
 
@@ -182,17 +190,19 @@ namespace LeonDrace.ProjectInitializer
 		{
 			CreateContainer(m_LocalPackagesTitle, () =>
 			{
-				EditorGUI.BeginChangeCheck();
+				//EditorGUI.BeginChangeCheck();
 
 				SerializedProperty localPackagesProperty = m_DataSerializedObject.FindProperty("m_Presets").
 				GetArrayElementAtIndex(m_SelectedPresetIndex).FindPropertyRelative("m_LocalPackages");
 
-				EditorGUILayout.PropertyField(localPackagesProperty);
+				//EditorGUILayout.PropertyField(localPackagesProperty);
 
-				if (EditorGUI.EndChangeCheck())
-				{
-					m_DataSerializedObject.ApplyModifiedProperties();
-				}
+				//if (EditorGUI.EndChangeCheck())
+				//{
+				//	m_DataSerializedObject.ApplyModifiedProperties();
+				//}
+
+				DrawPackages(localPackagesProperty, ref m_defaultLocalPackages);
 
 				ImportLocalPackages();
 			});
@@ -306,6 +316,96 @@ namespace LeonDrace.ProjectInitializer
 		private void CreateMessage(string message, MessageType messageType = MessageType.Info)
 		{
 			EditorGUILayout.HelpBox(message, messageType);
+		}
+
+		private void DrawPackages(SerializedProperty packagesProperty, ref bool drawDefault)
+		{
+			EditorGUILayout.BeginHorizontal();
+			DrawPackagesTab(m_defaultLocalPackageModeTitle, ref m_defaultLocalPackages, false);
+			DrawPackagesTab(m_filteredLocalPackageModeTitle, ref m_defaultLocalPackages, true);
+			EditorGUILayout.EndHorizontal();
+
+			if (m_defaultLocalPackages)
+			{
+				DrawDefaultPackages(packagesProperty);
+			}
+			else
+			{
+				DrawFilteredPackages(GetFilteredPackages(packagesProperty));
+			}
+		}
+
+		private SortedDictionary<string, List<SerializedProperty>> GetFilteredPackages(SerializedProperty packagesProperty)
+		{
+			var filtered = new SortedDictionary<string, List<SerializedProperty>>();
+
+			for (int i = 0; i < packagesProperty.arraySize; i++)
+			{
+				var package = packagesProperty.GetArrayElementAtIndex(i);
+				string tag = package.FindPropertyRelative("m_Tag").stringValue;
+				if (filtered.ContainsKey(tag))
+				{
+					filtered[tag].Add(package);
+
+				}
+				else
+				{
+					filtered.Add(tag, new List<SerializedProperty>() { package });
+				}
+			}
+
+			return filtered;
+		}
+
+		private void DrawPackagesTab(string title, ref bool state, bool inverse)
+		{
+			if (inverse ? !state : state)
+			{
+				GUI.backgroundColor = Color.grey;
+			}
+
+			if (GUILayout.Button(title, EditorStyles.toolbarButton))
+			{
+				state = !state;
+			}
+
+			if (inverse ? !state : state)
+			{
+				GUI.backgroundColor = m_DefaultGuiBackgroundColor;
+			}
+		}
+
+		private void DrawFilteredPackages(SortedDictionary<string, List<SerializedProperty>> filteredPackages)
+		{
+			EditorGUI.BeginChangeCheck();
+
+			foreach (var filter in filteredPackages)
+			{
+				CreateContainer(filter.Key, () =>
+				{
+					for (int i = 0; i < filter.Value.Count; i++)
+					{
+						EditorGUILayout.PropertyField(filter.Value[i]);
+					}
+				});
+			}
+
+			if (EditorGUI.EndChangeCheck())
+			{
+				m_DataSerializedObject.ApplyModifiedProperties();
+			}
+		}
+
+		private void DrawDefaultPackages(SerializedProperty packagesProperty)
+		{
+			EditorGUI.BeginChangeCheck();
+
+			EditorGUILayout.PropertyField(packagesProperty);
+
+			if (EditorGUI.EndChangeCheck())
+			{
+				m_DataSerializedObject.ApplyModifiedProperties();
+			}
 		}
 
 		#endregion
