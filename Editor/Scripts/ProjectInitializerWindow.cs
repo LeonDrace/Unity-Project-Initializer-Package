@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -381,7 +378,8 @@ namespace LeonDrace.ProjectInitializer
 				{
 					for (int i = 0; i < filter.Value.Count; i++)
 					{
-						bool isValid = IsValidPath(filter.Value[i].FindPropertyRelative("m_Path").stringValue, false);
+						bool isCustomPath = filter.Value[i].FindPropertyRelative("m_HasCustomPath").boolValue;
+						bool isValid = IsValidPath(filter.Value[i].FindPropertyRelative("m_Path").stringValue, isCustomPath);
 						bool isActive = filter.Value[i].FindPropertyRelative("m_Active").boolValue;
 
 						filter.Value[i].FindPropertyRelative("m_IsValid").boolValue = isValid;

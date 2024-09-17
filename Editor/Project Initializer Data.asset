@@ -43,7 +43,7 @@ MonoBehaviour:
       - TutorialInfo
     m_LocalPackages:
     - m_Active: 1
-      m_IsValid: 0
+      m_IsValid: 1
       m_HasCustomPath: 0
       m_Path: Muka Schultze\Editor ExtensionsUtilities\Fullscreen Editor.unitypackage
       m_Tag: Editor

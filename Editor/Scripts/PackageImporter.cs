@@ -1,8 +1,5 @@
-using Codice.Utils;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
@@ -39,6 +36,12 @@ namespace LeonDrace.ProjectInitializer
 			}
 		}
 
+		/// <summary>
+		/// Get the path at which Unity downloads its asset packs.
+		/// It takes a changes asset store cache into account.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
 		public static string GetUnityPackagePath(string path)
 		{
 			var defaultPath = Combine(GetFolderPath(SpecialFolder.ApplicationData), "Unity");
@@ -48,12 +51,24 @@ namespace LeonDrace.ProjectInitializer
 			return path;
 		}
 
+		/// <summary>
+		/// Validates if it is a proper URI https pattern.
+		/// Does not check if package is still available.
+		/// </summary>
+		/// <param name="uri"></param>
+		/// <returns></returns>
 		public static bool IsValidURI(string uri)
 		{
 			return Uri.TryCreate(uri, UriKind.Absolute, out Uri uriResult)
 				&& (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
 		}
 
+		/// <summary>
+		/// Validates if the package exists at the given path either Unity asset cache or a custom path.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <param name="isCustomPath"></param>
+		/// <returns></returns>
 		public static bool IsValidPath(string path, bool isCustomPath)
 		{
 			return isCustomPath ? File.Exists(path) : File.Exists(GetUnityPackagePath(path));
