@@ -40,6 +40,7 @@ namespace LeonDrace.ProjectInitializer
 
 		//Buttons
 		private Color m_DefaultGuiBackgroundColor = Color.white;
+		private Color m_DefaultGuiContentColor = Color.white;
 		private string m_CreateFolderButton = "Create Folder Setup";
 		private string m_DeletePresetButton = "Delete Preset";
 		private string m_DeleteMessage = "Are You Sure You Want To Delete The Entire Preset?";
@@ -52,12 +53,16 @@ namespace LeonDrace.ProjectInitializer
 		//Packages
 		private string m_defaultLocalPackageModeTitle = "Default";
 		private string m_filteredLocalPackageModeTitle = "Filtered";
+		private string m_InvalidPathMessage = "Invalid Path!. File does not exist at location.";
 		private bool m_defaultLocalPackages = false;
+		private Color m_InvalidPackageColor = Color.red;
+		private Color m_InvalidDisabledPackageColor = Color.yellow;
 
 		private void OnEnable()
 		{
 			m_Data = AssetInitializer.SearchForConfig<ProjectInitializerData>(AssetInitializer.ArchitectureFilter);
 			m_DefaultGuiBackgroundColor = GUI.backgroundColor;
+			m_DefaultGuiContentColor = GUI.contentColor;
 		}
 
 		private void OnGUI()
@@ -190,20 +195,10 @@ namespace LeonDrace.ProjectInitializer
 		{
 			CreateContainer(m_LocalPackagesTitle, () =>
 			{
-				//EditorGUI.BeginChangeCheck();
-
 				SerializedProperty localPackagesProperty = m_DataSerializedObject.FindProperty("m_Presets").
 				GetArrayElementAtIndex(m_SelectedPresetIndex).FindPropertyRelative("m_LocalPackages");
 
-				//EditorGUILayout.PropertyField(localPackagesProperty);
-
-				//if (EditorGUI.EndChangeCheck())
-				//{
-				//	m_DataSerializedObject.ApplyModifiedProperties();
-				//}
-
-				DrawPackages(localPackagesProperty, ref m_defaultLocalPackages);
-
+				DrawPackages(localPackagesProperty, m_defaultLocalPackageModeTitle, m_filteredLocalPackageModeTitle, ref m_defaultLocalPackages);
 				ImportLocalPackages();
 			});
 		}
@@ -215,7 +210,7 @@ namespace LeonDrace.ProjectInitializer
 				var localPackages = m_Data.Presets[m_SelectedPresetIndex].LocalPackages;
 				foreach (var package in localPackages)
 				{
-					if (package.Active)
+					if (package.Active && package.IsValid)
 					{
 						PackageImporter.ImportLocalPackage(package.Path);
 					}
@@ -318,14 +313,15 @@ namespace LeonDrace.ProjectInitializer
 			EditorGUILayout.HelpBox(message, messageType);
 		}
 
-		private void DrawPackages(SerializedProperty packagesProperty, ref bool drawDefault)
+		private void DrawPackages(SerializedProperty packagesProperty, string defaultTitle, string filteredTitle, ref bool drawDefault)
 		{
 			EditorGUILayout.BeginHorizontal();
-			DrawPackagesTab(m_defaultLocalPackageModeTitle, ref m_defaultLocalPackages, false);
-			DrawPackagesTab(m_filteredLocalPackageModeTitle, ref m_defaultLocalPackages, true);
+			DrawPackagesTab(defaultTitle, ref drawDefault, false);
+			DrawPackagesTab(filteredTitle, ref drawDefault, true);
 			EditorGUILayout.EndHorizontal();
+			GUILayout.Space(5);
 
-			if (m_defaultLocalPackages)
+			if (drawDefault)
 			{
 				DrawDefaultPackages(packagesProperty);
 			}
@@ -385,9 +381,26 @@ namespace LeonDrace.ProjectInitializer
 				{
 					for (int i = 0; i < filter.Value.Count; i++)
 					{
+						bool isValid = IsValidPath(filter.Value[i].FindPropertyRelative("m_Path").stringValue, false);
+						bool isActive = filter.Value[i].FindPropertyRelative("m_Active").boolValue;
+
+						filter.Value[i].FindPropertyRelative("m_IsValid").boolValue = isValid;
+
+						if (!isValid)
+						{
+							GUI.backgroundColor = isActive ? m_InvalidPackageColor : m_InvalidDisabledPackageColor;
+							CreateMessage(m_InvalidPathMessage, MessageType.Warning);
+						}
+
 						EditorGUILayout.PropertyField(filter.Value[i]);
+
+						if (!isValid)
+						{
+							GUI.backgroundColor = m_DefaultGuiBackgroundColor;
+						}
 					}
 				});
+				GUILayout.Space(2);
 			}
 
 			if (EditorGUI.EndChangeCheck())
@@ -406,6 +419,11 @@ namespace LeonDrace.ProjectInitializer
 			{
 				m_DataSerializedObject.ApplyModifiedProperties();
 			}
+		}
+
+		private bool IsValidPath(string path, bool isCustomPath)
+		{
+			return PackageImporter.IsValidPath(path, isCustomPath);
 		}
 
 		#endregion

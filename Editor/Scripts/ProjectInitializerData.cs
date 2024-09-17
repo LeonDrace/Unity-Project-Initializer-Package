@@ -67,6 +67,12 @@ namespace LeonDrace.ProjectInitializer
 			private bool m_Active;
 			public bool Active => m_Active;
 			[SerializeField]
+			private bool m_IsValid;
+			public bool IsValid => m_IsValid;
+			[SerializeField]
+			private bool m_HasCustomPath;
+			public bool HasCustomPath => m_HasCustomPath;
+			[SerializeField]
 			private string m_Path;
 			public string Path => m_Path;
 			[SerializeField]
