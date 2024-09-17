@@ -26,10 +26,7 @@ namespace LeonDrace.ProjectInitializer
 		{
 			if (unityPath)
 			{
-				var defaultPath = Combine(GetFolderPath(SpecialFolder.ApplicationData), "Unity");
-				var assetsFolder = Combine(EditorPrefs.GetString("AssetStoreCacheRootPath", defaultPath), "Asset Store-5.x");
-				path = path.EndsWith(".unitypackage") ? path : path + ".unitypackage";
-				path = Combine(assetsFolder, path);
+				path = GetUnityPackagePath(path);
 			}
 
 			if (File.Exists(path))
@@ -40,6 +37,26 @@ namespace LeonDrace.ProjectInitializer
 			{
 				Debug.Log($"File At Path: {path} Was Not Found! Make Sure To Download.");
 			}
+		}
+
+		public static string GetUnityPackagePath(string path)
+		{
+			var defaultPath = Combine(GetFolderPath(SpecialFolder.ApplicationData), "Unity");
+			var assetsFolder = Combine(EditorPrefs.GetString("AssetStoreCacheRootPath", defaultPath), "Asset Store-5.x");
+			path = path.EndsWith(".unitypackage") ? path : path + ".unitypackage";
+			path = Combine(assetsFolder, path);
+			return path;
+		}
+
+		public static bool IsValidURI(string uri)
+		{
+			return Uri.TryCreate(uri, UriKind.Absolute, out Uri uriResult)
+				&& (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+		}
+
+		public static bool IsValidPath(string path, bool isCustomPath)
+		{
+			return isCustomPath ? File.Exists(path) : File.Exists(GetUnityPackagePath(path));
 		}
 	}
 }
