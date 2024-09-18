@@ -27,7 +27,7 @@ namespace LeonDrace.ProjectInitializer
 		{
 			if (unityPath)
 			{
-				path = GetUnityPackagePath(path);
+				path = GetUnityPackageAtPath(path);
 			}
 
 			if (File.Exists(path))
@@ -93,7 +93,20 @@ namespace LeonDrace.ProjectInitializer
 		/// </summary>
 		/// <param name="path"></param>
 		/// <returns></returns>
-		public static string GetUnityPackagePath(string path)
+		public static string GetUnityAssetPath()
+		{
+			var defaultPath = Combine(GetFolderPath(SpecialFolder.ApplicationData), "Unity");
+			var assetsFolder = Combine(EditorPrefs.GetString("AssetStoreCacheRootPath", defaultPath), "Asset Store-5.x");
+			return assetsFolder;
+		}
+
+		/// <summary>
+		/// Get the path at which Unity downloads its asset packs.
+		/// It takes a changes asset store cache into account.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		public static string GetUnityPackageAtPath(string path)
 		{
 			var defaultPath = Combine(GetFolderPath(SpecialFolder.ApplicationData), "Unity");
 			var assetsFolder = Combine(EditorPrefs.GetString("AssetStoreCacheRootPath", defaultPath), "Asset Store-5.x");
@@ -127,7 +140,7 @@ namespace LeonDrace.ProjectInitializer
 		/// <returns></returns>
 		public static bool IsValidPath(string path, bool isCustomPath)
 		{
-			return isCustomPath ? File.Exists(path) : File.Exists(GetUnityPackagePath(path));
+			return isCustomPath ? File.Exists(path) : File.Exists(GetUnityPackageAtPath(path));
 		}
 	}
 }

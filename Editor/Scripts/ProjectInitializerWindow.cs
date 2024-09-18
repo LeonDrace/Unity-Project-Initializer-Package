@@ -226,6 +226,8 @@ namespace LeonDrace.ProjectInitializer
 
 		private void ImportLocalPackages()
 		{
+			EditorGUILayout.BeginHorizontal();
+
 			if (GUILayout.Button("Import"))
 			{
 				var localPackages = m_Data.Presets[m_SelectedPresetIndex].LocalPackages;
@@ -237,6 +239,13 @@ namespace LeonDrace.ProjectInitializer
 					}
 				}
 			}
+
+			if (GUILayout.Button("Open Asset Store Cache"))
+			{
+				EditorUtility.OpenWithDefaultApp(PackageImporter.GetUnityAssetPath());
+			}
+
+			EditorGUILayout.EndHorizontal();
 		}
 
 		private void DrawUrlPackages()

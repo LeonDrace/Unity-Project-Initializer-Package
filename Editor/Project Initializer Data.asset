@@ -43,9 +43,25 @@ MonoBehaviour:
       - TutorialInfo
     m_LocalPackages:
     - m_Active: 1
-      m_IsValid: 1
-      m_Tag: Editor
+      m_IsValid: 0
+      m_Tag: Editor Extension
       m_Path: Muka Schultze\Editor ExtensionsUtilities\Fullscreen Editor.unitypackage
+      m_HasCustomPath: 0
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: Animation
+      m_Path: Demigiant\Editor ExtensionsAnimation\DOTween HOTween v2.unitypackage
+      m_HasCustomPath: 0
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: Animation
+      m_Path: Demigiant\Editor ExtensionsVisual Scripting\DOTween Pro.unitypackage
+      m_HasCustomPath: 0
+    - m_Active: 1
+      m_IsValid: 1
+      m_Tag: Animation
+      m_Path: Kyrylo Kuzyk\Editor ExtensionsAnimation\PrimeTween High-Performance
+        Animations and Sequences.unitypackage
       m_HasCustomPath: 0
     m_UrlPackages:
     - m_Active: 0
@@ -132,6 +148,10 @@ MonoBehaviour:
       m_IsValid: 1
       m_Tag: Environment
       m_Url: com.unity.terrain-tools
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: Extension
+      m_Url: https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask#2.5.5
   - m_Name: Package
     m_FolderStructure:
       m_RootFolder: Assets
