@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -188,6 +189,24 @@ namespace LeonDrace.ProjectInitializer
 
 		#region Packages
 
+		private void DrawPackagesTab(string title, ref bool state, bool inverse)
+		{
+			if (inverse ? !state : state)
+			{
+				GUI.backgroundColor = Color.grey;
+			}
+
+			if (GUILayout.Button(title, EditorStyles.toolbarButton) && ((inverse && state) || (!inverse && !state)))
+			{
+				state = !state;
+			}
+
+			if (inverse ? !state : state)
+			{
+				GUI.backgroundColor = m_DefaultGuiBackgroundColor;
+			}
+		}
+
 		private void DrawLocalPackages()
 		{
 			CreateContainer(m_LocalPackagesTitle, () =>
@@ -195,7 +214,8 @@ namespace LeonDrace.ProjectInitializer
 				SerializedProperty localPackagesProperty = m_DataSerializedObject.FindProperty("m_Presets").
 				GetArrayElementAtIndex(m_SelectedPresetIndex).FindPropertyRelative("m_LocalPackages");
 
-				DrawPackages(localPackagesProperty, m_defaultLocalPackageModeTitle, m_filteredLocalPackageModeTitle, ref m_defaultLocalPackages);
+				DrawPackages(localPackagesProperty, m_defaultLocalPackageModeTitle, m_filteredLocalPackageModeTitle,
+					ref m_defaultLocalPackages, LocalPackageValidation);
 				ImportLocalPackages();
 			});
 		}
@@ -212,6 +232,103 @@ namespace LeonDrace.ProjectInitializer
 						PackageImporter.ImportLocalPackage(package.Path);
 					}
 				}
+			}
+		}
+
+		private void DrawPackages(SerializedProperty packagesProperty, string defaultTitle,
+			string filteredTitle, ref bool drawDefault, Func<SerializedProperty, bool> validator)
+		{
+			EditorGUILayout.BeginHorizontal();
+			DrawPackagesTab(defaultTitle, ref drawDefault, false);
+			DrawPackagesTab(filteredTitle, ref drawDefault, true);
+			EditorGUILayout.EndHorizontal();
+			GUILayout.Space(5);
+
+			if (drawDefault)
+			{
+				DrawDefaultPackages(packagesProperty);
+			}
+			else
+			{
+				DrawFilteredPackages(GetFilteredPackages(packagesProperty), validator);
+			}
+		}
+
+		private SortedDictionary<string, List<SerializedProperty>> GetFilteredPackages(SerializedProperty packagesProperty)
+		{
+			var filtered = new SortedDictionary<string, List<SerializedProperty>>();
+
+			for (int i = 0; i < packagesProperty.arraySize; i++)
+			{
+				var package = packagesProperty.GetArrayElementAtIndex(i);
+				string tag = package.FindPropertyRelative("m_Tag").stringValue;
+				if (filtered.ContainsKey(tag))
+				{
+					filtered[tag].Add(package);
+
+				}
+				else
+				{
+					filtered.Add(tag, new List<SerializedProperty>() { package });
+				}
+			}
+
+			return filtered;
+		}
+
+		private void DrawFilteredPackages(SortedDictionary<string, List<SerializedProperty>> filteredPackages, Func<SerializedProperty, bool> validator)
+		{
+			EditorGUI.BeginChangeCheck();
+
+			foreach (var filter in filteredPackages)
+			{
+				CreateContainer(filter.Key, () =>
+				{
+					for (int i = 0; i < filter.Value.Count; i++)
+					{
+						bool isValid = validator(filter.Value[i]);
+						bool isActive = filter.Value[i].FindPropertyRelative("m_Active").boolValue;
+
+						filter.Value[i].FindPropertyRelative("m_IsValid").boolValue = isValid;
+
+						if (!isValid)
+						{
+							GUI.backgroundColor = isActive ? m_InvalidPackageColor : m_InvalidDisabledPackageColor;
+							CreateMessage(m_InvalidPathMessage, MessageType.Warning);
+						}
+
+						EditorGUILayout.PropertyField(filter.Value[i]);
+
+						if (!isValid)
+						{
+							GUI.backgroundColor = m_DefaultGuiBackgroundColor;
+						}
+					}
+				});
+				GUILayout.Space(2);
+			}
+
+			if (EditorGUI.EndChangeCheck())
+			{
+				m_DataSerializedObject.ApplyModifiedProperties();
+			}
+		}
+
+		private bool LocalPackageValidation(SerializedProperty serializedProperty)
+		{
+			bool isCustomPath = serializedProperty.FindPropertyRelative("m_HasCustomPath").boolValue;
+			return IsValidPath(serializedProperty.FindPropertyRelative("m_Path").stringValue, isCustomPath);
+		}
+
+		private void DrawDefaultPackages(SerializedProperty packagesProperty)
+		{
+			EditorGUI.BeginChangeCheck();
+
+			EditorGUILayout.PropertyField(packagesProperty);
+
+			if (EditorGUI.EndChangeCheck())
+			{
+				m_DataSerializedObject.ApplyModifiedProperties();
 			}
 		}
 
@@ -308,115 +425,6 @@ namespace LeonDrace.ProjectInitializer
 		private void CreateMessage(string message, MessageType messageType = MessageType.Info)
 		{
 			EditorGUILayout.HelpBox(message, messageType);
-		}
-
-		private void DrawPackages(SerializedProperty packagesProperty, string defaultTitle, string filteredTitle, ref bool drawDefault)
-		{
-			EditorGUILayout.BeginHorizontal();
-			DrawPackagesTab(defaultTitle, ref drawDefault, false);
-			DrawPackagesTab(filteredTitle, ref drawDefault, true);
-			EditorGUILayout.EndHorizontal();
-			GUILayout.Space(5);
-
-			if (drawDefault)
-			{
-				DrawDefaultPackages(packagesProperty);
-			}
-			else
-			{
-				DrawFilteredPackages(GetFilteredPackages(packagesProperty));
-			}
-		}
-
-		private SortedDictionary<string, List<SerializedProperty>> GetFilteredPackages(SerializedProperty packagesProperty)
-		{
-			var filtered = new SortedDictionary<string, List<SerializedProperty>>();
-
-			for (int i = 0; i < packagesProperty.arraySize; i++)
-			{
-				var package = packagesProperty.GetArrayElementAtIndex(i);
-				string tag = package.FindPropertyRelative("m_Tag").stringValue;
-				if (filtered.ContainsKey(tag))
-				{
-					filtered[tag].Add(package);
-
-				}
-				else
-				{
-					filtered.Add(tag, new List<SerializedProperty>() { package });
-				}
-			}
-
-			return filtered;
-		}
-
-		private void DrawPackagesTab(string title, ref bool state, bool inverse)
-		{
-			if (inverse ? !state : state)
-			{
-				GUI.backgroundColor = Color.grey;
-			}
-
-			if (GUILayout.Button(title, EditorStyles.toolbarButton))
-			{
-				state = !state;
-			}
-
-			if (inverse ? !state : state)
-			{
-				GUI.backgroundColor = m_DefaultGuiBackgroundColor;
-			}
-		}
-
-		private void DrawFilteredPackages(SortedDictionary<string, List<SerializedProperty>> filteredPackages)
-		{
-			EditorGUI.BeginChangeCheck();
-
-			foreach (var filter in filteredPackages)
-			{
-				CreateContainer(filter.Key, () =>
-				{
-					for (int i = 0; i < filter.Value.Count; i++)
-					{
-						bool isCustomPath = filter.Value[i].FindPropertyRelative("m_HasCustomPath").boolValue;
-						bool isValid = IsValidPath(filter.Value[i].FindPropertyRelative("m_Path").stringValue, isCustomPath);
-						bool isActive = filter.Value[i].FindPropertyRelative("m_Active").boolValue;
-
-						filter.Value[i].FindPropertyRelative("m_IsValid").boolValue = isValid;
-
-						if (!isValid)
-						{
-							GUI.backgroundColor = isActive ? m_InvalidPackageColor : m_InvalidDisabledPackageColor;
-							CreateMessage(m_InvalidPathMessage, MessageType.Warning);
-						}
-
-						EditorGUILayout.PropertyField(filter.Value[i]);
-
-						if (!isValid)
-						{
-							GUI.backgroundColor = m_DefaultGuiBackgroundColor;
-						}
-					}
-				});
-				GUILayout.Space(2);
-			}
-
-			if (EditorGUI.EndChangeCheck())
-			{
-				m_DataSerializedObject.ApplyModifiedProperties();
-			}
-		}
-
-		private void DrawDefaultPackages(SerializedProperty packagesProperty)
-		{
-			EditorGUI.BeginChangeCheck();
-
-			EditorGUILayout.PropertyField(packagesProperty);
-
-			if (EditorGUI.EndChangeCheck())
-			{
-				m_DataSerializedObject.ApplyModifiedProperties();
-			}
 		}
 
 		private bool IsValidPath(string path, bool isCustomPath)
