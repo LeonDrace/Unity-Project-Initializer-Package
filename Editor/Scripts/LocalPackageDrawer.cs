@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace LeonDrace.ProjectInitializer
 {
-	[CustomPropertyDrawer(typeof(ProjectInitializerData.Package))]
-	public class PackageDrawer : PropertyDrawer
+	[CustomPropertyDrawer(typeof(LocalPackage))]
+	public class LocalPackageDrawer : PropertyDrawer
 	{
 		private string[] m_DisplayOptions = new string[2] { "Unity Path", "Custom Path" };
 		private int m_ActiveToggleWidth = 20;
