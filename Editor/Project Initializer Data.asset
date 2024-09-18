@@ -44,9 +44,94 @@ MonoBehaviour:
     m_LocalPackages:
     - m_Active: 1
       m_IsValid: 1
-      m_HasCustomPath: 0
-      m_Path: Muka Schultze\Editor ExtensionsUtilities\Fullscreen Editor.unitypackage
       m_Tag: Editor
+      m_Path: Muka Schultze\Editor ExtensionsUtilities\Fullscreen Editor.unitypackage
+      m_HasCustomPath: 0
+    m_UrlPackages:
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: Rendering
+      m_Url: com.unity.render-pipelines.high-definition
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: Rendering
+      m_Url: com.unity.render-pipelines.universal
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: Input
+      m_Url: com.unity.inputsystem
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: UI
+      m_Url: com.unity.ugui
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: UI
+      m_Url: com. unity. ui
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: UI
+      m_Url: com.unity.textmeshpro
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: Animation/Vfx
+      m_Url: com.unity.2d.animation
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: Animation/Vfx
+      m_Url: com.unity.visualeffectgraph
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: Animation/Vfx
+      m_Url: com.unity.timeline
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: Animation/Vfx
+      m_Url: com.unity.postprocessing
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: Camera
+      m_Url: com.unity.cinemachine
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: ECS
+      m_Url: com.unity.entities.graphics
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: ECS
+      m_Url: com.unity.entities
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: Profiling
+      m_Url: com.unity.memoryprofiler
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: Tools
+      m_Url: com.unity.addressables
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: Tools
+      m_Url: com.unity.ai.navigation
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: Tools
+      m_Url: com.unity.recorder
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: Tools
+      m_Url: com.unity.splines
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: Extension
+      m_Url: com.unity.serialization
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: Extension
+      m_Url: com.unity.test-framework
+    - m_Active: 0
+      m_IsValid: 1
+      m_Tag: Environment
+      m_Url: com.unity.terrain-tools
   - m_Name: Package
     m_FolderStructure:
       m_RootFolder: Assets
@@ -60,3 +145,4 @@ MonoBehaviour:
       m_DeletedFolders:
       - Scenes
     m_LocalPackages: []
+    m_UrlPackages: []

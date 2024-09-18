@@ -58,6 +58,10 @@ namespace LeonDrace.ProjectInitializer
 			[SerializeField]
 			private LocalPackage[] m_LocalPackages;
 			public LocalPackage[] LocalPackages => m_LocalPackages;
+
+			[SerializeField]
+			private UrlPackage[] m_UrlPackages;
+			public UrlPackage[] UrlPackages => m_UrlPackages;
 		}
 	}
 }

@@ -26,6 +26,7 @@ namespace LeonDrace.ProjectInitializer
 		private string m_PresetsTitle = "Presets";
 		private string m_NoPresets = "Create a Preset!";
 		private string m_LocalPackagesTitle = "Local Packages";
+		private string m_UrlPackagesTitle = "Url Packages";
 		private string m_DebugTitle = "Debug";
 		private string m_ImportExportTitle = "Import/Export";
 
@@ -53,6 +54,7 @@ namespace LeonDrace.ProjectInitializer
 		private string m_filteredLocalPackageModeTitle = "Filtered";
 		private string m_InvalidPathMessage = "Invalid Path!. File does not exist at location.";
 		private bool m_defaultLocalPackages = false;
+		private bool m_defaultUrlPackages = false;
 		private Color m_InvalidPackageColor = Color.red;
 		private Color m_InvalidDisabledPackageColor = Color.yellow;
 
@@ -76,6 +78,8 @@ namespace LeonDrace.ProjectInitializer
 			DrawFolderSetup();
 			GUILayout.Space(5);
 			DrawLocalPackages();
+			GUILayout.Space(5);
+			DrawUrlPackages();
 			GUILayout.Space(5);
 			DrawDebugOptions();
 
@@ -235,6 +239,35 @@ namespace LeonDrace.ProjectInitializer
 			}
 		}
 
+		private void DrawUrlPackages()
+		{
+			CreateContainer(m_UrlPackagesTitle, () =>
+			{
+				SerializedProperty localPackagesProperty = m_DataSerializedObject.FindProperty("m_Presets").
+				GetArrayElementAtIndex(m_SelectedPresetIndex).FindPropertyRelative("m_UrlPackages");
+
+				DrawPackages(localPackagesProperty, m_defaultLocalPackageModeTitle, m_filteredLocalPackageModeTitle,
+					ref m_defaultUrlPackages, UrlPackageValidation);
+
+				ImportUrlPackages();
+			});
+		}
+
+		private void ImportUrlPackages()
+		{
+			if (GUILayout.Button("Import"))
+			{
+				var urlPackages = m_Data.Presets[m_SelectedPresetIndex].UrlPackages;
+				foreach (var package in urlPackages)
+				{
+					if (package.Active && package.IsValid)
+					{
+						PackageImporter.ImportUrlPackage(package.Url);
+					}
+				}
+			}
+		}
+
 		private void DrawPackages(SerializedProperty packagesProperty, string defaultTitle,
 			string filteredTitle, ref bool drawDefault, Func<SerializedProperty, bool> validator)
 		{
@@ -318,6 +351,12 @@ namespace LeonDrace.ProjectInitializer
 		{
 			bool isCustomPath = serializedProperty.FindPropertyRelative("m_HasCustomPath").boolValue;
 			return IsValidPath(serializedProperty.FindPropertyRelative("m_Path").stringValue, isCustomPath);
+		}
+
+		private bool UrlPackageValidation(SerializedProperty serializedProperty)
+		{
+			//Will be validated on import by package manager.
+			return true;
 		}
 
 		private void DrawDefaultPackages(SerializedProperty packagesProperty)
