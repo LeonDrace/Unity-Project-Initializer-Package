@@ -13,11 +13,13 @@ Custom Editor Window to quickly generate folders, batch import local and remote 
 To use open Window/LeonDrace/Project Initializer.
 
 ## Steps:
+- Create a preset or use one of the existing ones.
 - Create your folder structure
 - Add and enable your local packages, which have to be downloaded first and present at the defined location.
 - Add and enable your remote packages. The Packagemanager will give info whether the package is valid or not. (It requires a package manifest)
 - Use either the button in each section to do its import or in the header. Make sure to give it a few seconds after each action due to asset database refreshes, compiling etc.
 - This might be improved in a future release to make it a one button load preset action which sequentially goes through all operations.
+- Save your created presets as a json so you can quickly import them next time.
 
 ## Good To Know:
 - There might be some packages that can cause problems when they auto import or create files on their own after importing. In most cases it should work fine though.
