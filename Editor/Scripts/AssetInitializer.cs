@@ -10,6 +10,7 @@ namespace LeonDrace.ProjectInitializer
 	public class AssetInitializer
 	{
 		public static readonly string ArchitectureFilter = "l:architecture";
+		public static bool IsProcessing { get; private set; }
 
 		public static void CreateFolderStructure(FolderStructure folderStructure)
 		{
@@ -21,6 +22,8 @@ namespace LeonDrace.ProjectInitializer
 				return;
 			}
 
+			IsProcessing = true;
+
 			CreateFolders(folderStructure.RootFolder, folderStructure.CreatedFolders);
 			Refresh();
 			var currentPaths = folderStructure.MovedFiles.Select(x => x.CurrentPath).ToArray();
@@ -29,6 +32,8 @@ namespace LeonDrace.ProjectInitializer
 			Refresh();
 			DeleteFolders(folderStructure.DeletedFolders);
 			Refresh();
+
+			IsProcessing = false;
 		}
 
 		public static string GetFullRootPath(string root)

@@ -39,7 +39,6 @@ namespace LeonDrace.ProjectInitializer
 
 		//Buttons
 		private Color m_DefaultGuiBackgroundColor = Color.white;
-		private Color m_DefaultGuiContentColor = Color.white;
 		private string m_CreateFolderButton = "Create Folder Setup";
 		private string m_DeletePresetButton = "Delete Preset";
 		private string m_DeleteMessage = "Are You Sure You Want To Delete The Entire Preset?";
@@ -53,6 +52,9 @@ namespace LeonDrace.ProjectInitializer
 		private string m_defaultLocalPackageModeTitle = "Default";
 		private string m_filteredLocalPackageModeTitle = "Filtered";
 		private string m_InvalidPathMessage = "Invalid Path!. File does not exist at location.";
+		private string m_IsProcessing = "Is Importing";
+		private string m_ImportLocalPackages = "Import Local Packages";
+		private string m_ImportRemotePackages = "Import Remote Packages";
 		private bool m_defaultLocalPackages = false;
 		private bool m_defaultUrlPackages = false;
 		private Color m_InvalidPackageColor = Color.red;
@@ -62,7 +64,6 @@ namespace LeonDrace.ProjectInitializer
 		{
 			m_Data = AssetInitializer.SearchForConfig<ProjectInitializerData>(AssetInitializer.ArchitectureFilter);
 			m_DefaultGuiBackgroundColor = GUI.backgroundColor;
-			m_DefaultGuiContentColor = GUI.contentColor;
 		}
 
 		private void OnGUI()
@@ -71,20 +72,38 @@ namespace LeonDrace.ProjectInitializer
 			m_DataSerializedObject = new SerializedObject(m_Data);
 			m_ScrollPos = EditorGUILayout.BeginScrollView(m_ScrollPos);
 
-			DrawImporterExporter();
-			GUILayout.Space(5);
-			DrawPresets();
-			GUILayout.Space(5);
-			DrawFolderSetup();
-			GUILayout.Space(5);
-			DrawLocalPackages();
-			GUILayout.Space(5);
-			DrawUrlPackages();
-			GUILayout.Space(5);
-			DrawDebugOptions();
+			if (!DrawIsProcessing())
+			{
+				DrawImporterExporter();
+				GUILayout.Space(5);
+				DrawPresets();
+				GUILayout.Space(5);
+				DrawFolderSetup();
+				GUILayout.Space(5);
+				DrawLocalPackages();
+				GUILayout.Space(5);
+				DrawRemotePackages();
+				GUILayout.Space(5);
+				DrawDebugOptions();
+			}
 
 			EditorGUILayout.EndScrollView();
 		}
+
+		#region Processing
+
+		private bool DrawIsProcessing()
+		{
+			if (PackageImporter.IsProcessing || AssetInitializer.IsProcessing || EditorApplication.isUpdating || EditorApplication.isCompiling)
+			{
+				CreateMessage(m_IsProcessing);
+				return true;
+			}
+
+			return false;
+		}
+
+		#endregion
 
 		#region Preset - Tabs
 
@@ -123,7 +142,22 @@ namespace LeonDrace.ProjectInitializer
 				}
 
 				EditorGUILayout.EndHorizontal();
+
+				HeaderButtons();
 			});
+		}
+
+		private void HeaderButtons()
+		{
+			EditorGUILayout.BeginHorizontal();
+
+			CreateFolderStructureButton();
+			ImportLocalPackagesButton();
+			ImportRemotePackagesButton();
+
+			EditorGUILayout.EndHorizontal();
+
+			DeletePresetButton();
 		}
 
 		#endregion
@@ -135,8 +169,7 @@ namespace LeonDrace.ProjectInitializer
 			CreateContainer(m_FolderCreationTitle, () =>
 			{
 				ShowFolderStructureConfig();
-				CreateFolderStructure();
-				DeletePreset();
+				CreateFolderStructureButton();
 			});
 		}
 
@@ -169,15 +202,20 @@ namespace LeonDrace.ProjectInitializer
 			}
 		}
 
-		private void CreateFolderStructure()
+		private void CreateFolderStructureButton()
 		{
 			if (GUILayout.Button(m_CreateFolderButton))
 			{
-				AssetInitializer.CreateFolderStructure(m_Data.Presets[m_SelectedPresetIndex].FolderStructure);
+				CreateFolderStructure();
 			}
 		}
 
-		private void DeletePreset()
+		private void CreateFolderStructure()
+		{
+			AssetInitializer.CreateFolderStructure(m_Data.Presets[m_SelectedPresetIndex].FolderStructure);
+		}
+
+		private void DeletePresetButton()
 		{
 			if (GUILayout.Button(m_DeletePresetButton))
 			{
@@ -220,61 +258,98 @@ namespace LeonDrace.ProjectInitializer
 
 				DrawPackages(localPackagesProperty, m_defaultLocalPackageModeTitle, m_filteredLocalPackageModeTitle,
 					ref m_defaultLocalPackages, LocalPackageValidation);
-				ImportLocalPackages();
+				LocalPackagesButtons();
 			});
 		}
 
-		private void ImportLocalPackages()
+		private void LocalPackagesButtons()
 		{
 			EditorGUILayout.BeginHorizontal();
 
-			if (GUILayout.Button("Import"))
-			{
-				var localPackages = m_Data.Presets[m_SelectedPresetIndex].LocalPackages;
-				foreach (var package in localPackages)
-				{
-					if (package.Active && package.IsValid)
-					{
-						PackageImporter.ImportLocalPackage(package.Path);
-					}
-				}
-			}
-
-			if (GUILayout.Button("Open Asset Store Cache"))
-			{
-				EditorUtility.OpenWithDefaultApp(PackageImporter.GetUnityAssetPath());
-			}
+			ImportLocalPackagesButton();
+			OpenAssetStoreCacheButton();
 
 			EditorGUILayout.EndHorizontal();
 		}
 
-		private void DrawUrlPackages()
+		private void OpenAssetStoreCacheButton()
+		{
+			if (GUILayout.Button("Open Asset Store Cache"))
+			{
+				EditorUtility.OpenWithDefaultApp(PackageImporter.GetUnityAssetPath());
+			}
+		}
+
+		private void ImportLocalPackagesButton()
+		{
+			if (GUILayout.Button(m_ImportLocalPackages))
+			{
+				ImportLocalPackages();
+			}
+		}
+
+		private void ImportLocalPackages()
+		{
+			PackageImporter.ImportLocalPackages(GetLocalPackages());
+		}
+
+		private KeyValuePair<string, bool>[] GetLocalPackages()
+		{
+			var localPackages = m_Data.Presets[m_SelectedPresetIndex].LocalPackages;
+			List<KeyValuePair<string, bool>> packages = new List<KeyValuePair<string, bool>>();
+
+			for (int i = 0; i < localPackages.Length; i++)
+			{
+				if (localPackages[i].Active && localPackages[i].IsValid)
+				{
+					packages.Add(new KeyValuePair<string, bool>(localPackages[i].Path, localPackages[i].HasCustomPath));
+				}
+			}
+
+			return packages.ToArray();
+		}
+
+
+		private void DrawRemotePackages()
 		{
 			CreateContainer(m_UrlPackagesTitle, () =>
 			{
 				SerializedProperty localPackagesProperty = m_DataSerializedObject.FindProperty("m_Presets").
-				GetArrayElementAtIndex(m_SelectedPresetIndex).FindPropertyRelative("m_UrlPackages");
+				GetArrayElementAtIndex(m_SelectedPresetIndex).FindPropertyRelative("m_RemotePackages");
 
 				DrawPackages(localPackagesProperty, m_defaultLocalPackageModeTitle, m_filteredLocalPackageModeTitle,
 					ref m_defaultUrlPackages, UrlPackageValidation);
 
-				ImportUrlPackages();
+				ImportRemotePackagesButton();
 			});
 		}
 
-		private void ImportUrlPackages()
+		private void ImportRemotePackagesButton()
 		{
-			if (GUILayout.Button("Import"))
+			if (GUILayout.Button(m_ImportRemotePackages))
 			{
-				var urlPackages = m_Data.Presets[m_SelectedPresetIndex].UrlPackages;
-				foreach (var package in urlPackages)
+				ImportRemotePackages();
+			}
+		}
+
+		private void ImportRemotePackages()
+		{
+			PackageImporter.ImportRemotePackages(GetRemotePackages());
+		}
+
+		private string[] GetRemotePackages()
+		{
+			var urlPackages = m_Data.Presets[m_SelectedPresetIndex].RemotePackages;
+
+			List<string> urls = new List<string>();
+			foreach (var package in urlPackages)
+			{
+				if (package.Active && package.IsValid)
 				{
-					if (package.Active && package.IsValid)
-					{
-						PackageImporter.ImportUrlPackage(package.Url);
-					}
+					urls.Add(package.Url);
 				}
 			}
+			return urls.ToArray();
 		}
 
 		private void DrawPackages(SerializedProperty packagesProperty, string defaultTitle,

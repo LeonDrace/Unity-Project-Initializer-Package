@@ -28,7 +28,7 @@ namespace LeonDrace.ProjectInitializer
 	}
 
 	[System.Serializable]
-	public sealed class UrlPackage : Package
+	public sealed class RemotePackage : Package
 	{
 		[SerializeField]
 		private string m_Url;

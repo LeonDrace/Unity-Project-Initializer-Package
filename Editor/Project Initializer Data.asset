@@ -43,7 +43,7 @@ MonoBehaviour:
       - TutorialInfo
     m_LocalPackages:
     - m_Active: 1
-      m_IsValid: 0
+      m_IsValid: 1
       m_Tag: Editor Extension
       m_Path: Muka Schultze\Editor ExtensionsUtilities\Fullscreen Editor.unitypackage
       m_HasCustomPath: 0
@@ -63,7 +63,7 @@ MonoBehaviour:
       m_Path: Kyrylo Kuzyk\Editor ExtensionsAnimation\PrimeTween High-Performance
         Animations and Sequences.unitypackage
       m_HasCustomPath: 0
-    m_UrlPackages:
+    m_RemotePackages:
     - m_Active: 0
       m_IsValid: 1
       m_Tag: Rendering
@@ -72,10 +72,6 @@ MonoBehaviour:
       m_IsValid: 1
       m_Tag: Rendering
       m_Url: com.unity.render-pipelines.universal
-    - m_Active: 0
-      m_IsValid: 1
-      m_Tag: Input
-      m_Url: com.unity.inputsystem
     - m_Active: 0
       m_IsValid: 1
       m_Tag: UI
@@ -100,7 +96,7 @@ MonoBehaviour:
       m_IsValid: 1
       m_Tag: Animation/Vfx
       m_Url: com.unity.timeline
-    - m_Active: 0
+    - m_Active: 1
       m_IsValid: 1
       m_Tag: Animation/Vfx
       m_Url: com.unity.postprocessing
@@ -148,10 +144,14 @@ MonoBehaviour:
       m_IsValid: 1
       m_Tag: Environment
       m_Url: com.unity.terrain-tools
-    - m_Active: 0
+    - m_Active: 1
       m_IsValid: 1
       m_Tag: Extension
       m_Url: https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask#2.5.5
+    - m_Active: 1
+      m_IsValid: 1
+      m_Tag: Input
+      m_Url: com.unity.inputsystem
   - m_Name: Package
     m_FolderStructure:
       m_RootFolder: Assets
@@ -165,4 +165,4 @@ MonoBehaviour:
       m_DeletedFolders:
       - Scenes
     m_LocalPackages: []
-    m_UrlPackages: []
+    m_RemotePackages: []

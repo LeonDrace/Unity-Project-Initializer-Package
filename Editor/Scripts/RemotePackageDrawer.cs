@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace LeonDrace.ProjectInitializer
 {
-	[CustomPropertyDrawer(typeof(UrlPackage))]
-	public class UrlPackageDrawer : PropertyDrawer
+	[CustomPropertyDrawer(typeof(RemotePackage))]
+	public class RemotePackageDrawer : PropertyDrawer
 	{
 		private int m_ActiveToggleWidth = 20;
 		private float m_PathPercentage = 0.85f;
